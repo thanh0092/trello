@@ -6,11 +6,11 @@ import List from "@/components/List";
 type Props = {};
 type TodoSchema = {
   titleList: string | null;
-  content: [];
-  //   date: Date | null;
+  content: string[];
+  // date: Date | null;
 };
-const WorkSpace = (props: Props) => {
-  let list = [];
+
+const WorkSpace: NextPage<Props> = (props: Props) => {
   const textAreaRef = useRef<HTMLInputElement | null>(null);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
   const [todoData, setTodoData] = useState<TodoSchema>({
@@ -19,21 +19,17 @@ const WorkSpace = (props: Props) => {
     // date: null,
   });
 
-  const [storedValue, setValue, removeValue] = useLocalStorage("list", []);
-  const [listValue, setListValue, removeListValue] = useLocalStorage(
-    "store",
-    []
-  );
+  const [storedValue, setValue, removeValue] = useLocalStorage<
+    Record<string, TodoSchema>
+  >("list", {});
+
   const handleSetAddCard = () => {
     setAddCard(true);
   };
+
   const handleCloseAddCard = () => {
     setAddCard(false);
   };
-  //   const now : Date = new Date;
-  //   const date = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
-  //   const time = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-  //   const dateTime = date + ' ' + time;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTodoData({
@@ -41,21 +37,21 @@ const WorkSpace = (props: Props) => {
       content: [],
     });
   };
+
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    list.push(todoData);
+    const newId = Date.now().toString();
+    setValue((prev) => ({
+      ...prev,
+      [newId]: todoData,
+    }));
     setAddCard(false);
-    
-    // setValue((pre) => {
-    //     const updateList = {
-    //        ...pre,...list
-    //     }
-    //     return updateList
-    // } );
   };
+
   useEffect(() => {
     textAreaRef.current?.focus();
-  }, [textAreaRef, isAddCard]);
+  }, [isAddCard]);
+
   return (
     <>
       <div className="font-bold min-w-fit w-[100%] bg-slate-300 p-4 text-center">
@@ -63,15 +59,14 @@ const WorkSpace = (props: Props) => {
       </div>
 
       <div className="flex gap-5 mt-3">
-        {storedValue.length != 0 && (
+        {Object.keys(storedValue).length !== 0 && (
           <>
-            {Object.keys(storedValue).map((item: Key, index) => {
+            {Object.keys(storedValue).map((item: Key) => {
               const data = storedValue[item];
               return (
-                <div>
+                <div key={item}>
                   <List
-                    key={item}
-                    id={index}
+                    id={Number(item)}
                     title={data.titleList}
                     content={data.content}
                   />
@@ -83,38 +78,36 @@ const WorkSpace = (props: Props) => {
 
         <div className="bg-slate-400 p-4 h-[100px] max-h-[200px] text-xl rounded-lg">
           <div>
-            {" "}
             <p>Add List</p>
           </div>
           <hr />
 
           {isAddCard ? (
-            <>
-              <form className="w-[300px] mt-2">
-                <input
-                  ref={textAreaRef}
-                  className="resize-none rounded-lg min-h-[100px] break-all"
-                  onChange={handleChange}
-                />
-                <div className="flex justify-between  mt-3">
-                  <button
-                    className="bg-slate-300 w-[30%] rounded-lg"
-                    onClick={handleSubmit}
-                  >
-                    Add
-                  </button>
-                  <button
-                    className="bg-slate-300 rounded-lg w-[30%]"
-                    onClick={handleCloseAddCard}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </>
+            <form className="w-[300px] mt-2" onSubmit={handleSubmit}>
+              <input
+                ref={textAreaRef}
+                className="resize-none rounded-lg min-h-[100px] break-all"
+                onChange={handleChange}
+              />
+              <div className="flex justify-between mt-3">
+                <button
+                  className="bg-slate-300 w-[30%] rounded-lg"
+                  type="submit"
+                >
+                  Add
+                </button>
+                <button
+                  className="bg-slate-300 rounded-lg w-[30%]"
+                  type="button"
+                  onClick={handleCloseAddCard}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           ) : (
             <button
-              className="rounded-lg text-xl h-[50px]  w-[300px] "
+              className="rounded-lg text-xl h-[50px] w-[300px]"
               onClick={handleSetAddCard}
             >
               Add More List
