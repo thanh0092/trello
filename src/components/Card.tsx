@@ -1,18 +1,87 @@
-import React, { useEffect, useState } from "react";
+import { useLocalStorage } from "@/hook/useLocalStorage";
+import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
+import { Calendar } from 'react-calendar';
 
-type Props = {
-  data: [];
-  id: Number;
+type Card = {
+  id: string | number;
+  data: [
+    {
+      id: string;
+      title: String;
+    }
+  ];
 };
-
-const Card = (data: Props) => {
-  const [updateContent, setUpdateContent] = useState("");
-  const handleGetContent = (id) => {
+type Content = {
+  id: string;
+  title: string;
+};
+const Card = (data: Card) => {
+  const inputRef = useRef(null);
+  const [updateContent, setUpdateContent] = useState<Card | {}>({});
+  const [isInput, setInput] = useState<Boolean>(false);
+  const [dataUpdate, setDataUpdate] = useState("");
+  const [date,setDate] = useState("")
+  const handleGetContent = (id: String) => {
     const dataSelect = data.data.find((data) => data.id === id);
     return dataSelect;
   };
+  const [storedValue, setValue, removeValue] = useLocalStorage("list", {});
 
+  const handleInput = () => {
+    setInput(true);
+    setDataUpdate(updateContent.title);
+  };
+  const handleClose = () => {
+    setInput(false);
+  };
+  const handleFixCard = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setDataUpdate(e.target.value);
+  };
+  const handleDelete = () => {
+    setValue((prev: Card) => {
+      return {
+        ...prev,
+        [data.id]: {
+          ...prev[data.id],
+          content: [
+            ...(prev[data.id]?.content ?? []).filter((item: Content) => {
+              return item.id !== updateContent.id;
+            }),
+          ],
+        },
+      };
+    });
+  };
+  const handleUpdate = (e: SyntheticEvent) => {
+    e.preventDefault();
+    setValue((prev: Card) => {
+      return {
+        ...prev,
+        [data.id]: {
+          ...prev[data.id],
+          content: [
+            ...(prev[data.id]?.content ?? []).map((item: Content) => {
+              if (item.id === updateContent.id) {
+                return {
+                  ...item,
+                  title: dataUpdate,
+                  date: date
+                };
+              }
+              return item;
+            }),
+          ],
+        },
+      };
+    });
+    setInput(false);
+  };
   useEffect(() => {
+    inputRef.current?.focus();
+    setUpdateContent;
+  }, [inputRef, isInput]);
+  useEffect(() => {
+    setDataUpdate(updateContent?.title);
     const items = document.querySelectorAll(".item");
 
     items.forEach((item) => {
@@ -27,13 +96,15 @@ const Card = (data: Props) => {
 
       item.addEventListener("click", handleClick);
 
-      // Cleanup event listeners on component unmount
       return () => {
         item.removeEventListener("click", handleClick);
       };
     });
-  }, [data]);
-
+  }, [data, updateContent]);
+  const onChange = (e) => {
+    setDate(e.toLocaleString());
+    
+  }
   return (
     <>
       {data.data.length > 0 ? (
@@ -41,9 +112,45 @@ const Card = (data: Props) => {
           {data.data.map((item: [], index) => {
             return (
               <>
-                <div key={item.id} className="item" data-id={item.id}>
-                  <p className="break-all">{item.title}</p>
-                </div>
+                {isInput && item?.id === updateContent?.id ? (
+                  <form onSubmit={handleUpdate} >
+                    <input
+                      type="text"
+                      className="w-[250px] mb-3"
+                      ref={inputRef}
+                      defaultValue={item.title}
+                      onChange={handleFixCard}
+                    />
+                    <Calendar onClickDay={onChange} dateFormat="dd/mm/yy" showIcon/>
+
+                    <div className="flex justify-between">
+                      <button>Fix</button>
+                      <button
+                        className="bg-slate-300 rounded-lg w-[30%]"
+                        onClick={handleDelete}
+                      >
+                        Delete
+                      </button>
+                      <button onClick={handleClose}>Cancel</button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <div
+                      key={item.id}
+                      className="item"
+                      data-id={item.id}
+                      onClick={handleInput}
+                    >
+                      <p>{item.date}</p>
+                      <p className="break-all bg-slate-500 p-2 rounded-lg">
+                        {item.title}
+                      </p>
+
+                      <hr />
+                    </div>
+                  </>
+                )}
               </>
             );
           })}

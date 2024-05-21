@@ -9,11 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fortawesome/react-fontawesome": "^0.2.1",
+    "@mui/material": "^5.15.18",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
+    "@mui/x-date-pickers": "^7.5.0",
     "@reduxjs/toolkit": "^2.2.5",
+    "font-awesome": "^4.7.0",
+    "fortawesome": "^0.0.1-security",
     "next": "14.2.3",
+    "primereact": "^10.6.5",
     "react": "^18",
+    "react-calendar": "^5.0.0",
     "react-dom": "^18",
+    "react-fontawesome": "^1.7.1",
     "react-localstorage": "^1.0.0",
+    "styled-components": "^6.1.11",
     "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {
