@@ -4,20 +4,32 @@ import { Calendar } from 'react-calendar';
 
 type Card = {
   id: string | number;
-  data: [
-    {
-      id: string;
-      title: String;
-    }
-  ];
+  data: Content[]
 };
 type Content = {
   id: string;
   title: string;
 };
+type ContentItem = {
+  id: string;
+  title: string;
+  date: string; 
+}
+
+type Data = {
+  [key: number]: {
+    titleList: string;
+    content: ContentItem[];
+  };
+}
+
 const Card = (data: Card) => {
+  const initdata: Content = {
+    id: "",
+    title: ""
+  }
   const inputRef = useRef(null);
-  const [updateContent, setUpdateContent] = useState<Card | {}>({});
+  const [updateContent, setUpdateContent] = useState<Content>(initdata);
   const [isInput, setInput] = useState<Boolean>(false);
   const [dataUpdate, setDataUpdate] = useState("");
   const [date,setDate] = useState("")
@@ -38,7 +50,9 @@ const Card = (data: Card) => {
     setDataUpdate(e.target.value);
   };
   const handleDelete = () => {
-    setValue((prev: Card) => {
+    setValue((prev: Data) => {
+      console.log(prev);
+      
       return {
         ...prev,
         [data.id]: {
