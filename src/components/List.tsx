@@ -9,7 +9,6 @@ type Props = {
 };
 
 const List = ({ title, content, id }: Props) => {
-    
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
   const [cardValue, setCardValue] = useState("");
@@ -30,16 +29,19 @@ const List = ({ title, content, id }: Props) => {
     setAddCard(false);
     storedValue[id].content.push(cardValue);
     setValue((prevState) => {
-    const updatedValue = {
-      ...prevState,
-      [id]: {
-        ...prevState[id],
-        content: [...(prevState[id]?.content || []), cardValue],
-      },
-    };
-    console.log(updatedValue);
-    return updatedValue;
-  });
+      const idContent = Date.now().toString();
+      const updatedValue = {
+        ...prevState,
+        [id]: {
+          ...prevState[id],
+          content: [
+            ...(prevState[id]?.content || []),
+            { id: idContent, title: cardValue },
+          ],
+        },
+      };
+      return updatedValue;
+    });
   };
 
   useEffect(() => {
