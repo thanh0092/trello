@@ -1,40 +1,57 @@
 import { useLocalStorage } from "@/hook/useLocalStorage";
-import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { Calendar } from 'react-calendar';
+import React, {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { ReactSortable } from "react-sortablejs";
+import FormCardUpdate from "./FormCardUpdate";
+import CardItem from "./CardItem";
 
 type Card = {
-  id: string | number;
-  data: Content[]
+  id: string;
+  data: Content[];
 };
 type Content = {
   id: string;
   title: string;
+  date: String;
 };
 type ContentItem = {
   id: string;
   title: string;
-  date: string; 
-}
+  date: string;
+};
 
 type Data = {
   [key: number]: {
     titleList: string;
     content: ContentItem[];
   };
-}
+};
 
-const Card = (data: Card) => {
+const Card = ({ data, id }: Card) => {
+
+  
   const initdata: Content = {
     id: "",
-    title: ""
-  }
-  const inputRef = useRef(null);
+    title: "",
+    date: "",
+  };
+  const inputRef = useRef<HTMLInputElement>(null);
   const [updateContent, setUpdateContent] = useState<Content>(initdata);
+
   const [isInput, setInput] = useState<Boolean>(false);
   const [dataUpdate, setDataUpdate] = useState("");
-  const [date,setDate] = useState("")
+  const [date, setDate] = useState("");
+  const [list, setList] = useState<Content[]>(data);
+
+  
   const handleGetContent = (id: String) => {
-    const dataSelect = data.data.find((data) => data.id === id);
+    const dataSelect = data.find((data) => data.id === id);
+    
     return dataSelect;
   };
   const [storedValue, setValue, removeValue] = useLocalStorage("list", {});
@@ -51,14 +68,12 @@ const Card = (data: Card) => {
   };
   const handleDelete = () => {
     setValue((prev: Data) => {
-      console.log(prev);
-      
       return {
         ...prev,
-        [data.id]: {
-          ...prev[data.id],
+        [id]: {
+          ...prev[id],
           content: [
-            ...(prev[data.id]?.content ?? []).filter((item: Content) => {
+            ...(prev[id]?.content ?? []).filter((item: Content) => {
               return item.id !== updateContent.id;
             }),
           ],
@@ -66,20 +81,22 @@ const Card = (data: Card) => {
       };
     });
   };
+
   const handleUpdate = (e: SyntheticEvent) => {
     e.preventDefault();
+
     setValue((prev: Card) => {
       return {
         ...prev,
-        [data.id]: {
-          ...prev[data.id],
+        [id]: {
+          ...prev[id],
           content: [
-            ...(prev[data.id]?.content ?? []).map((item: Content) => {
+            ...(prev[id]?.content ?? []).map((item: Content) => {
               if (item.id === updateContent.id) {
                 return {
                   ...item,
                   title: dataUpdate,
-                  date: date
+                  date: date,
                 };
               }
               return item;
@@ -90,21 +107,45 @@ const Card = (data: Card) => {
     });
     setInput(false);
   };
+
+  const handleUpdateSort = useCallback(
+    (newData: Content[]) => {
+      setValue((prev) => {
+        return {
+          ...prev,
+          [id]: {
+            ...prev[id],
+            content: newData,
+          },
+        };
+      });
+    },
+    [setValue]
+  );
+  useEffect(() => {
+    handleUpdateSort(list);
+  }, [list, handleUpdateSort]);
+
+  
+
+  const onChange = (e) => {
+    setDate(e.toLocaleString());
+  };
   useEffect(() => {
     inputRef.current?.focus();
-    setUpdateContent;
   }, [inputRef, isInput]);
   useEffect(() => {
     setDataUpdate(updateContent?.title);
     const items = document.querySelectorAll(".item");
 
     items.forEach((item) => {
-      const handleClick = (e: Event) => {
-        const target = e.currentTarget as HTMLElement;
-        const paragraph = target.querySelector("p");
-        if (paragraph) {
-          const id = target.getAttribute("data-id") || "";
-          setUpdateContent(handleGetContent(id));
+      const handleClick = (event: Event) => {
+        const targetElement = event.currentTarget as HTMLElement;
+        const contentParagraph = targetElement.querySelector("p") as HTMLParagraphElement;
+        if (contentParagraph) {
+          const contentId = targetElement.getAttribute("data-id") || "";
+          const clickedContent = handleGetContent(contentId);
+          setUpdateContent(clickedContent);
         }
       };
 
@@ -115,63 +156,45 @@ const Card = (data: Card) => {
       };
     });
   }, [data, updateContent]);
-  const onChange = (e) => {
-    setDate(e.toLocaleString());
-    
-  }
+
   return (
     <>
-      {data.data.length > 0 ? (
-        <>
-          {data.data.map((item: [], index) => {
-            return (
-              <>
-                {isInput && item?.id === updateContent?.id ? (
-                  <form onSubmit={handleUpdate} >
-                    <input
-                      type="text"
-                      className="w-[250px] mb-3"
-                      ref={inputRef}
-                      defaultValue={item.title}
-                      onChange={handleFixCard}
-                    />
-                    <Calendar onClickDay={onChange} dateFormat="dd/mm/yy" showIcon/>
-
-                    <div className="flex justify-between">
-                      <button>Fix</button>
-                      <button
-                        className="bg-slate-300 rounded-lg w-[30%]"
-                        onClick={handleDelete}
-                      >
-                        Delete
-                      </button>
-                      <button onClick={handleClose}>Cancel</button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <div
-                      key={item.id}
-                      className="item"
-                      data-id={item.id}
-                      onClick={handleInput}
-                    >
-                      <p>{item.date}</p>
-                      <p className="break-all bg-slate-500 p-2 rounded-lg">
-                        {item.title}
-                      </p>
-
-                      <hr />
-                    </div>
-                  </>
-                )}
-              </>
-            );
-          })}
-        </>
-      ) : (
-        "No data"
-      )}
+      <ReactSortable
+        group={"list"}
+        filter=".addImageButtonContainer"
+        dragClass="sortableDrag"
+        list={list}
+        setList={(newList: Content[]) => {
+          setList(newList);
+          
+          // handleUpdateSort(newList);
+        }}
+        animation={200}
+        easing="ease-out"
+      >
+        {data.map((item: Content, index) => {
+          return (
+            <>
+              {isInput && item?.id === updateContent?.id ? (
+                <FormCardUpdate
+                  handleUpdate={handleUpdate}
+                  inputRef={inputRef}
+                  item={item}
+                  handleFixCard={handleFixCard}
+                  onChange={onChange}
+                  date={date}
+                  handleDelete={handleDelete}
+                  handleClose={handleClose}
+                />
+              ) : (
+                <>
+                  <CardItem item={item} handleInput={handleInput} />
+                </>
+              )}
+            </>
+          );
+        })}
+      </ReactSortable>
     </>
   );
 };

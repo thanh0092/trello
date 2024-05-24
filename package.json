@@ -25,6 +25,8 @@
     "react-dom": "^18",
     "react-fontawesome": "^1.7.1",
     "react-localstorage": "^1.0.0",
+    "react-sortable": "^2.0.0",
+    "react-sortablejs": "^6.1.4",
     "styled-components": "^6.1.11",
     "usehooks-ts": "^3.1.0"
   },

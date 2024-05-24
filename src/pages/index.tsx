@@ -18,7 +18,7 @@ const WorkSpace: NextPage<Props> = (props: Props) => {
     titleList: null,
     // date: null,
   });
-
+  const [data,setData] = useState<TodoSchema | {}>({})
   const [storedValue, setValue, removeValue] = useLocalStorage<
     Record<string, TodoSchema>
   >("list", {});
@@ -51,7 +51,9 @@ const WorkSpace: NextPage<Props> = (props: Props) => {
   useEffect(() => {
     textAreaRef.current?.focus();
   }, [isAddCard]);
-
+  useEffect(() => {
+    setData(storedValue)
+  },[storedValue,data])
   return (
     <>
       <div className="font-bold min-w-fit w-[100%] bg-slate-300 p-4 text-center">
@@ -59,16 +61,16 @@ const WorkSpace: NextPage<Props> = (props: Props) => {
       </div>
 
       <div className="flex gap-5 mt-3">
-        {Object.keys(storedValue).length !== 0 && (
+        {Object.keys(data).length !== 0 && (
           <>
-            {Object.keys(storedValue).map((item: Key) => {
-              const data = storedValue[item];
+            {Object.keys(data).map((item: Key,index) => {
+              const dataItem = data[item];
               return (
                 <div key={item}>
                   <List
                     id={Number(item)}
-                    title={data.titleList}
-                    content={data.content}
+                    title={dataItem?.titleList}
+                    content={dataItem?.content}
                   />
                 </div>
               );
