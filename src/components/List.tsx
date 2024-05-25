@@ -18,7 +18,7 @@ const List = ({ title, content, id }: Props) => {
   const [dataUpdate, setDataUpdate] = useState("");
   const [date, setDate] = useState("");
   const [storedValue, setValue, removeValue] = useLocalStorage("list", {});
-  
+
   const handleSetAddCard = () => {
     setAddCard(true);
   };
@@ -56,7 +56,9 @@ const List = ({ title, content, id }: Props) => {
     return result;
   };
 
-  const handleSetListUpdate = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSetListUpdate = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     setDataUpdate(e.target.value);
   };
   const onChange = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -66,19 +68,19 @@ const List = ({ title, content, id }: Props) => {
     e.preventDefault();
     setAddCard(false);
     storedValue[id].content.push(cardValue);
-    
+
     setValue((prevState) => {
       const idContent = Date.now().toString();
       const updatedValue = {
-      ...prevState,
-      [id]: {
-        ...prevState[id], 
-        content: [
-          ...(prevState[id]?.content || []),
+        ...prevState,
+        [id]: {
+          ...prevState[id],
+          content: [
+            ...(prevState[id]?.content || []),
             { id: idContent, title: cardValue, date: date },
-        ],
-      },
-      };      
+          ],
+        },
+      };
       return updatedValue;
     });
   };
@@ -87,7 +89,7 @@ const List = ({ title, content, id }: Props) => {
     textAreaRef.current?.focus();
     inputChangeTitle.current?.focus();
   }, [textAreaRef, isAddCard, inputChangeTitle, input]);
-  
+
   return (
     <div className=" rounded-lg  p-2 text-xl flex flex-col justify-center gap-4 w-[300px] max-w-[300px] bg-slate-400">
       <div className="flex justify-between">
