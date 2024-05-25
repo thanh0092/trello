@@ -1,7 +1,7 @@
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import Card from "@/components/Card";
-import { Calendar } from 'react-calendar';
+import { Calendar } from "react-calendar";
 
 type Props = {
   content: [];
@@ -12,7 +12,7 @@ type Props = {
 const List = ({ title, content, id }: Props) => {
   const inputChangeTitle = useRef<HTMLInputElement | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [option,setOption] = useState(false)
+  const [option, setOption] = useState(false);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
   const [input, setInput] = useState<Boolean>(false);
   const [cardValue, setCardValue] = useState("");
@@ -147,7 +147,11 @@ const List = ({ title, content, id }: Props) => {
               onChange={handleChange}
               className="resize-none rounded-lg min-h-[100px] break-all	"
             />
-            <Calendar className="bg-slate-400" value={date} onChange={onChange}/>
+            <Calendar
+              className="bg-slate-400"
+              defaultValue={date}
+              onChange={onChange}
+            />
 
             <div className="flex justify-between">
               <button

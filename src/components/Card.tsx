@@ -1,10 +1,10 @@
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { Calendar } from 'react-calendar';
+import { Calendar } from "react-calendar";
 
 type Card = {
   id: string | number;
-  data: Content[]
+  data: Content[];
 };
 type Content = {
   id: string;
@@ -13,32 +13,33 @@ type Content = {
 type ContentItem = {
   id: string;
   title: string;
-  date: string; 
-}
+  date: string;
+};
 
 type Data = {
   [key: number]: {
     titleList: string;
     content: ContentItem[];
   };
-}
+};
 
 const Card = (data: Card) => {
   const initdata: Content = {
     id: "",
-    title: ""
-  }
+    title: "",
+  };
   const inputRef = useRef(null);
   const [updateContent, setUpdateContent] = useState<Content>(initdata);
   const [isInput, setInput] = useState<Boolean>(false);
   const [dataUpdate, setDataUpdate] = useState("");
-  const [date,setDate] = useState("")
+  const [date, setDate] = useState("");
+
   const handleGetContent = (id: String) => {
     const dataSelect = data.data.find((data) => data.id === id);
     return dataSelect;
   };
   const [storedValue, setValue, removeValue] = useLocalStorage("list", {});
-
+  
   const handleInput = () => {
     setInput(true);
     setDataUpdate(updateContent.title);
@@ -52,7 +53,7 @@ const Card = (data: Card) => {
   const handleDelete = () => {
     setValue((prev: Data) => {
       console.log(prev);
-      
+
       return {
         ...prev,
         [data.id]: {
@@ -79,7 +80,7 @@ const Card = (data: Card) => {
                 return {
                   ...item,
                   title: dataUpdate,
-                  date: date
+                  date: date,
                 };
               }
               return item;
@@ -116,9 +117,8 @@ const Card = (data: Card) => {
     });
   }, [data, updateContent]);
   const onChange = (e) => {
-    setDate(e.toLocaleString());
-    
-  }
+    setDate(e);
+  };
   return (
     <>
       {data.data.length > 0 ? (
@@ -127,7 +127,7 @@ const Card = (data: Card) => {
             return (
               <>
                 {isInput && item?.id === updateContent?.id ? (
-                  <form onSubmit={handleUpdate} >
+                  <form onSubmit={handleUpdate}>
                     <input
                       type="text"
                       className="w-[250px] mb-3"
@@ -135,7 +135,11 @@ const Card = (data: Card) => {
                       defaultValue={item.title}
                       onChange={handleFixCard}
                     />
-                    <Calendar onClickDay={onChange} dateFormat="dd/mm/yy" showIcon/>
+                    <Calendar
+                      onClickDay={onChange}
+                      dateFormat="dd/mm/yy"
+                      showIcon
+                    />
 
                     <div className="flex justify-between">
                       <button>Fix</button>
@@ -152,6 +156,7 @@ const Card = (data: Card) => {
                   <>
                     <div
                       key={item.id}
+                      draggable
                       className="item"
                       data-id={item.id}
                       onClick={handleInput}
