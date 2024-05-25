@@ -1,26 +1,24 @@
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import Card from "@/components/Card";
-import { Calendar } from "react-calendar";
+import FormListAdd from "./FormListAdd";
 
 type Props = {
   content: [];
   title: string;
-  id: Number;
+  id: number;
 };
 
 const List = ({ title, content, id }: Props) => {
   const inputChangeTitle = useRef<HTMLInputElement | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [option, setOption] = useState(false);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
   const [input, setInput] = useState<Boolean>(false);
   const [cardValue, setCardValue] = useState("");
   const [dataUpdate, setDataUpdate] = useState("");
   const [date, setDate] = useState("");
-
   const [storedValue, setValue, removeValue] = useLocalStorage("list", {});
-
+  
   const handleSetAddCard = () => {
     setAddCard(true);
   };
@@ -36,8 +34,9 @@ const List = ({ title, content, id }: Props) => {
   const handleCancel = () => {
     setInput(false);
   };
-  const handleSubmitListUpdate = () => {
-    setValue((prev) => {
+
+  const handleSubmitListUpdate = (dataUpdate: string): void => {
+    setValue((prev: Record<string, Props>): Record<string, Props> => {
       return {
         ...prev,
         [id]: {
@@ -48,6 +47,7 @@ const List = ({ title, content, id }: Props) => {
     });
     setInput(false);
   };
+
   const handleDelete = () => {
     const result = delete storedValue[id];
     setValue({
@@ -55,28 +55,30 @@ const List = ({ title, content, id }: Props) => {
     });
     return result;
   };
-  const handleSetListUpdate = (e) => {
+
+  const handleSetListUpdate = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setDataUpdate(e.target.value);
   };
-  const onChange = (e) => {
+  const onChange = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setDate(e.toLocaleString());
   };
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     setAddCard(false);
     storedValue[id].content.push(cardValue);
+    
     setValue((prevState) => {
       const idContent = Date.now().toString();
       const updatedValue = {
-        ...prevState,
-        [id]: {
-          ...prevState[id],
-          content: [
-            ...(prevState[id]?.content || []),
+      ...prevState,
+      [id]: {
+        ...prevState[id], 
+        content: [
+          ...(prevState[id]?.content || []),
             { id: idContent, title: cardValue, date: date },
-          ],
-        },
-      };
+        ],
+      },
+      };      
       return updatedValue;
     });
   };
@@ -85,7 +87,7 @@ const List = ({ title, content, id }: Props) => {
     textAreaRef.current?.focus();
     inputChangeTitle.current?.focus();
   }, [textAreaRef, isAddCard, inputChangeTitle, input]);
-
+  
   return (
     <div className=" rounded-lg  p-2 text-xl flex flex-col justify-center gap-4 w-[300px] max-w-[300px] bg-slate-400">
       <div className="flex justify-between">
@@ -104,7 +106,9 @@ const List = ({ title, content, id }: Props) => {
               <div className="flex justify-between">
                 <button
                   className="bg-slate-100 w-20 mt-2 rounded-lg"
-                  onClick={handleSubmitListUpdate}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>): void => {
+                    handleSubmitListUpdate(dataUpdate);
+                  }}
                 >
                   Update
                 </button>
@@ -141,34 +145,14 @@ const List = ({ title, content, id }: Props) => {
       <Card id={id} data={content} />
       {isAddCard ? (
         <>
-          <form className="mx-auto">
-            <textarea
-              ref={textAreaRef}
-              onChange={handleChange}
-              className="resize-none rounded-lg min-h-[100px] break-all	"
-            />
-            <Calendar
-              className="bg-slate-400"
-              defaultValue={date}
-              onChange={onChange}
-            />
-
-            <div className="flex justify-between">
-              <button
-                className="bg-slate-300 w-[30%] rounded-lg"
-                onClick={handleSubmit}
-              >
-                Add
-              </button>
-
-              <button
-                className="bg-slate-300 rounded-lg w-[30%]"
-                onClick={handleCloseAddCard}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+          <FormListAdd
+            handleChange={handleChange}
+            onChange={onChange}
+            date={date}
+            textAreaRef={textAreaRef}
+            handleCloseAddCard={handleCloseAddCard}
+            handleSubmit={handleSubmit}
+          />
         </>
       ) : (
         <button className="bg-slate-300 rounded-lg" onClick={handleSetAddCard}>
