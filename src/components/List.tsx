@@ -1,7 +1,14 @@
-import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { useLocalStorage } from "@/hook/useLocalStorage";
+import React, {
+  SyntheticEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Card from "@/components/Card";
 import FormListAdd from "./FormListAdd";
+import { useLocalStorage } from "@/hook/useLocalStorage";
+import { StoreContext } from "@/context/StoreContext";
 
 type Props = {
   content: [];
@@ -14,11 +21,12 @@ const List = ({ title, content, id }: Props) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
   const [input, setInput] = useState<Boolean>(false);
+  const [listData, setListData] = useState(content);
   const [cardValue, setCardValue] = useState("");
   const [dataUpdate, setDataUpdate] = useState("");
   const [date, setDate] = useState("");
-  const [storedValue, setValue, removeValue] = useLocalStorage("list", {});
-  
+  const { storedValue, setValue, setContent, setId } = useContext(StoreContext);
+
   const handleSetAddCard = () => {
     setAddCard(true);
   };
@@ -56,7 +64,9 @@ const List = ({ title, content, id }: Props) => {
     return result;
   };
 
-  const handleSetListUpdate = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSetListUpdate = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     setDataUpdate(e.target.value);
   };
   const onChange = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -66,28 +76,31 @@ const List = ({ title, content, id }: Props) => {
     e.preventDefault();
     setAddCard(false);
     storedValue[id].content.push(cardValue);
-    
+
     setValue((prevState) => {
       const idContent = Date.now().toString();
       const updatedValue = {
-      ...prevState,
-      [id]: {
-        ...prevState[id], 
-        content: [
-          ...(prevState[id]?.content || []),
+        ...prevState,
+        [id]: {
+          ...prevState[id],
+          content: [
+            ...(prevState[id]?.content || []),
             { id: idContent, title: cardValue, date: date },
-        ],
-      },
-      };      
+          ],
+        },
+      };
+      setListData(updatedValue[id].content);
       return updatedValue;
     });
   };
 
   useEffect(() => {
+    setId(id);
+    setContent(listData);
     textAreaRef.current?.focus();
     inputChangeTitle.current?.focus();
-  }, [textAreaRef, isAddCard, inputChangeTitle, input]);
-  
+  }, [textAreaRef, isAddCard, inputChangeTitle, input, id]);
+
   return (
     <div className=" rounded-lg  p-2 text-xl flex flex-col justify-center gap-4 w-[300px] max-w-[300px] bg-slate-400">
       <div className="flex justify-between">

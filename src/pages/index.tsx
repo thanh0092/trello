@@ -1,7 +1,8 @@
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import type { NextPage } from "next";
-import React, { Key, useEffect, useRef, useState } from "react";
+import React, { Key, useContext, useEffect, useRef, useState } from "react";
 import List from "@/components/List";
+import { StoreContext } from "@/context/StoreContext";
 
 type Props = {};
 type TodoSchema = {
@@ -13,15 +14,13 @@ type TodoSchema = {
 const WorkSpace: NextPage<Props> = (props: Props) => {
   const textAreaRef = useRef<HTMLInputElement | null>(null);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
+  const { storedValue, setValue } = useContext(StoreContext);
   const [todoData, setTodoData] = useState<TodoSchema>({
     content: [],
     titleList: null,
     // date: null,
   });
-  const [data,setData] = useState<TodoSchema | {}>({})
-  const [storedValue, setValue, removeValue] = useLocalStorage<
-    Record<string, TodoSchema>
-  >("list", {});
+  const [data, setData] = useState<TodoSchema | {}>({});
 
   const handleSetAddCard = () => {
     setAddCard(true);
@@ -52,8 +51,8 @@ const WorkSpace: NextPage<Props> = (props: Props) => {
     textAreaRef.current?.focus();
   }, [isAddCard]);
   useEffect(() => {
-    setData(storedValue)
-  },[storedValue,data])
+    setData(storedValue);
+  }, [storedValue, data]);
   return (
     <>
       <div className="font-bold min-w-fit w-[100%] bg-slate-300 p-4 text-center">
@@ -63,7 +62,7 @@ const WorkSpace: NextPage<Props> = (props: Props) => {
       <div className="flex gap-5 mt-3">
         {Object.keys(data).length !== 0 && (
           <>
-            {Object.keys(data).map((item: Key,index) => {
+            {Object.keys(data).map((item: Key, index) => {
               const dataItem = data[item];
               return (
                 <div key={item}>
