@@ -36,14 +36,15 @@ type Data = {
   };
 };
 
-const Card = ({ id }: CardProps) => {
+const Card = ({ id,listData,handleSubmit }: CardProps) => {
   const initdata: Content = {
     id: "",
     title: "",
     date: "",
   };
-  const { storedValue, setValue, listData } = useContext(StoreContext);
-
+  
+  const { storedValue, setValue } = useContext<{}>(StoreContext);
+  
   const inputRef = useRef<HTMLInputElement>(null);
   const [updateContent, setUpdateContent] = useState<Content>(initdata);
   const [isInput, setInput] = useState<Boolean>(false);
@@ -128,7 +129,9 @@ const Card = ({ id }: CardProps) => {
   useEffect(() => {
     handleUpdateSort(list);
   }, [list, handleUpdateSort]);
-
+  useEffect(() => {
+    setList(listData);
+  },[listData])
   const onChange = (e: any) => {
     setDate(new Date().toLocaleString());
   };

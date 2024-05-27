@@ -155,7 +155,7 @@ const List = ({ title, content, id }: Props) => {
         )}
       </div>
       <hr />
-      <Card id={id} data={content} />
+      <Card id={id} data={content} listData={listData} handleSubmit={handleSubmit} />
       {isAddCard ? (
         <>
           <FormListAdd
