@@ -36,7 +36,6 @@ const FormCardUpdate = ({
       />
       <Calendar
         onClickDay={onChange}
-        
         defaultValue={date}
       />
 

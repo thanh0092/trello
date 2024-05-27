@@ -13,7 +13,7 @@ const CardItem = ({ item, handleInput }: Props) => {
   return (
     <div
       key={item?.id}
-      className="item m-3"
+      className="item m-3 cursor-move"
       data-id={item?.id}
       onClick={handleInput}
     >

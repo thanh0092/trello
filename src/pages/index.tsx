@@ -1,21 +1,21 @@
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import type { NextPage } from "next";
-import React, { Dispatch, Key, SetStateAction, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import List from "@/components/List";
 import { StoreContext } from "@/context/StoreContext";
 import { StoreContextProps, TodoSchema } from "@/interface";
-import { log } from "console";
-
+import { ReactSortable } from "react-sortablejs";
 
 const WorkSpace: NextPage<TodoSchema> = () => {
   const textAreaRef = useRef<HTMLInputElement | null>(null);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
-  const { storedValue, setValue,content,setContent,setId } = useContext<StoreContextProps>(StoreContext);
+  const { storedValue, setValue } = useContext<StoreContextProps>(StoreContext);
   const [todoData, setTodoData] = useState<TodoSchema>({
     content: [],
     titleList: null,
   });
   const [data, setData] = useState<Record<string, TodoSchema>>({});
+console.log(data);
 
   const handleSetAddCard = () => {
     setAddCard(true);
@@ -88,7 +88,7 @@ const WorkSpace: NextPage<TodoSchema> = () => {
           <hr />
 
           {isAddCard ? (
-            <form className="w-[300px] mt-2" onSubmit={handleSubmit}>
+            <form className="mt-2" onSubmit={handleSubmit}>
               <input
                 ref={textAreaRef}
                 className="resize-none rounded-lg min-h-[100px] break-all"

@@ -139,6 +139,7 @@ const List = ({ title, content, id }: Props) => {
   }, [textAreaRef, isAddCard, inputChangeTitle, input, id]);
     
   return (
+    
     <div className=" rounded-lg  p-2 text-xl flex flex-col justify-center gap-4 w-[300px] max-w-[300px] bg-slate-400">
       <div className="flex justify-between">
         
