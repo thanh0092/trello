@@ -1,4 +1,5 @@
 import React, {
+  Dispatch,
   SyntheticEvent,
   useContext,
   useEffect,
@@ -9,12 +10,14 @@ import Card from "@/components/Card";
 import FormListAdd from "./FormListAdd";
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import { StoreContext } from "@/context/StoreContext";
+import { Content, StoreContextProps } from "@/interface";
 
 type Props = {
-  content: [];
+  content: Content[];
   title: string;
-  id: number;
+  id: string;
 };
+
 
 const List = ({ title, content, id }: Props) => {
   const inputChangeTitle = useRef<HTMLInputElement | null>(null);
@@ -22,10 +25,10 @@ const List = ({ title, content, id }: Props) => {
   const [isAddCard, setAddCard] = useState<Boolean>(false);
   const [input, setInput] = useState<Boolean>(false);
   const [listData, setListData] = useState(content);
-  const [cardValue, setCardValue] = useState("");
+  const [cardValue, setCardValue] = useState(null);
   const [dataUpdate, setDataUpdate] = useState("");
   const [date, setDate] = useState("");
-  const { storedValue, setValue, setContent, setId } = useContext(StoreContext);
+  const { storedValue, setValue, setContent, setId } = useContext<StoreContextProps>(StoreContext);
 
   const handleSetAddCard = () => {
     setAddCard(true);
@@ -33,7 +36,7 @@ const List = ({ title, content, id }: Props) => {
   const handleCloseAddCard = () => {
     setAddCard(false);
   };
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setCardValue(e.target.value);
   };
   const handleUpdate = () => {
@@ -44,7 +47,7 @@ const List = ({ title, content, id }: Props) => {
   };
 
   const handleSubmitListUpdate = (dataUpdate: string): void => {
-    setValue((prev: Record<string, Props>): Record<string, Props> => {
+    setValue((prev) => {
       return {
         ...prev,
         [id]: {
@@ -69,7 +72,7 @@ const List = ({ title, content, id }: Props) => {
   ): void => {
     setDataUpdate(e.target.value);
   };
-  const onChange = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const onChange = (e: Date) => {
     setDate(e.toLocaleString());
   };
   const handleSubmit = (e: SyntheticEvent) => {
@@ -77,7 +80,8 @@ const List = ({ title, content, id }: Props) => {
     setAddCard(false);
     storedValue[id].content.push(cardValue);
 
-    setValue((prevState) => {
+
+    setValue((prevState: Record<string, { titleList: string; content: Content[] }>) => {
       const idContent = Date.now().toString();
       const updatedValue = {
         ...prevState,
@@ -155,7 +159,7 @@ const List = ({ title, content, id }: Props) => {
         )}
       </div>
       <hr />
-      <Card id={id} data={content} listData={listData} handleSubmit={handleSubmit} />
+      <Card id={id} listData={listData} />
       {isAddCard ? (
         <>
           <FormListAdd

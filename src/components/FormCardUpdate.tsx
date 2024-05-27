@@ -10,7 +10,7 @@ type Props = {
   item: Content;
   handleFixCard: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onChange: (e: Date) => void;
-  date: String | string
+  date: string;
   handleDelete: () => void;
   handleClose: () => void;
 };
@@ -37,8 +37,7 @@ const FormCardUpdate = ({
       />
       <Calendar
         onClickDay={onChange}
-        dateFormat="dd/MM/yyyy"
-        showIcon
+        
         value={date}
       />
 

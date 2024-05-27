@@ -11,46 +11,27 @@ import { ReactSortable } from "react-sortablejs";
 import FormCardUpdate from "./FormCardUpdate";
 import CardItem from "./CardItem";
 import { StoreContext } from "@/context/StoreContext";
+import { Content, StoreContextProps } from "@/interface";
 
 type CardProps = {
   id: string;
-  data: Content[];
+  listData: Content[];
 };
 
-type Content = {
-  id: string;
-  title: string;
-  date: string;
-};
-
-type ContentItem = {
-  id: string;
-  title: string;
-  date: string;
-};
-
-type Data = {
-  [key: number]: {
-    titleList: string;
-    content: ContentItem[];
-  };
-};
-
-const Card = ({ id,listData,handleSubmit }: CardProps) => {
+const Card = ({ id,listData }: CardProps) => {
   const initdata: Content = {
     id: "",
     title: "",
     date: "",
   };
   
-  const { storedValue, setValue } = useContext<{}>(StoreContext);
-  
+  const { storedValue, setValue } = useContext<StoreContextProps>(StoreContext);
   const inputRef = useRef<HTMLInputElement>(null);
   const [updateContent, setUpdateContent] = useState<Content>(initdata);
   const [isInput, setInput] = useState<Boolean>(false);
   const [dataUpdate, setDataUpdate] = useState("");
-  const [date, setDate] = useState("");
-  const [list, setList] = useState<Content[]>(storedValue[id].content);
+  const [date, setDate] = useState(null);
+  const [list, setList] = useState<Content[]>(storedValue[id]?.content);
 
   const handleGetContent = (contentId: string) => {
     return list.find((data) => data.id === contentId);
@@ -70,7 +51,7 @@ const Card = ({ id,listData,handleSubmit }: CardProps) => {
   };
 
   const handleDelete = () => {
-    setValue((prev: Data) => {
+    setValue((prev) => {
       const newContent = (prev[id]?.content ?? []).filter(
         (item: Content) => item.id !== updateContent.id
       );
@@ -87,7 +68,9 @@ const Card = ({ id,listData,handleSubmit }: CardProps) => {
 
   const handleUpdate = (e: SyntheticEvent) => {
     e.preventDefault();
-    setValue((prev: Data) => {
+    setValue((prev) => {
+      console.log(prev);
+      
       const newContent = (prev[id]?.content ?? []).map((item: Content) => {
         if (item.id === updateContent.id) {
           return {
@@ -112,7 +95,7 @@ const Card = ({ id,listData,handleSubmit }: CardProps) => {
 
   const handleUpdateSort = useCallback(
     (newData: Content[]) => {
-      setValue((prev: Data) => {
+      setValue((prev) => {
         return {
           ...prev,
           [id]: {
@@ -132,8 +115,9 @@ const Card = ({ id,listData,handleSubmit }: CardProps) => {
   useEffect(() => {
     setList(listData);
   },[listData])
-  const onChange = (e: any) => {
-    setDate(new Date().toLocaleString());
+  const onChange = (e: Date) => {
+    
+    setDate(e.toLocaleString());
   };
 
   useEffect(() => {

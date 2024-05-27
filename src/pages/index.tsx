@@ -1,26 +1,21 @@
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import type { NextPage } from "next";
-import React, { Key, useContext, useEffect, useRef, useState } from "react";
+import React, { Dispatch, Key, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import List from "@/components/List";
 import { StoreContext } from "@/context/StoreContext";
+import { StoreContextProps, TodoSchema } from "@/interface";
 
-type Props = {};
-type TodoSchema = {
-  titleList: string | null;
-  content: string[];
-  // date: Date | null;
-};
 
-const WorkSpace: NextPage<Props> = (props: Props) => {
+const WorkSpace: NextPage<TodoSchema> = () => {
   const textAreaRef = useRef<HTMLInputElement | null>(null);
   const [isAddCard, setAddCard] = useState<Boolean>(false);
-  const { storedValue, setValue } = useContext(StoreContext);
+  const { storedValue, setValue,content,setContent,setId } = useContext<StoreContextProps>(StoreContext);
   const [todoData, setTodoData] = useState<TodoSchema>({
     content: [],
     titleList: null,
     // date: null,
   });
-  const [data, setData] = useState<TodoSchema | {}>({});
+  const [data, setData] = useState<Record<string, TodoSchema>>({});
 
   const handleSetAddCard = () => {
     setAddCard(true);
@@ -40,7 +35,7 @@ const WorkSpace: NextPage<Props> = (props: Props) => {
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const newId = Date.now().toString();
-    setValue((prev) => ({
+    setValue((prev: any) => ({
       ...prev,
       [newId]: todoData,
     }));
@@ -62,12 +57,13 @@ const WorkSpace: NextPage<Props> = (props: Props) => {
       <div className="flex gap-5 mt-3">
         {Object.keys(data).length !== 0 && (
           <>
-            {Object.keys(data).map((item: Key, index) => {
+            {Object.keys(data).map((item: string, index) => {
               const dataItem = data[item];
+              
               return (
                 <div key={item}>
                   <List
-                    id={Number(item)}
+                    id={item}
                     title={dataItem?.titleList}
                     content={dataItem?.content}
                   />

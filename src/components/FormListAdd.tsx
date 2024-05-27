@@ -3,9 +3,9 @@ import Calendar from "react-calendar";
 
 type Props = {
     textAreaRef: Ref<HTMLTextAreaElement>
-    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     date: string,
-    onChange: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    onChange: (date: Date) => void;
     handleSubmit : (e: SyntheticEvent) => void,
     handleCloseAddCard: () => void
 };
@@ -18,7 +18,7 @@ const FormListAdd = ({textAreaRef,handleChange,date, onChange,handleSubmit,handl
         onChange={handleChange}
         className="resize-none rounded-lg min-h-[100px] break-all	"
       />
-      <Calendar className="bg-slate-400" value={date} onChange={onChange} />
+      <Calendar className="bg-slate-400" value={date} onChange={(value) => onChange(value as Date)} />
 
       <div className="flex justify-between">
         <button
