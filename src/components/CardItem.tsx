@@ -17,7 +17,10 @@ const CardItem = ({ item, handleInput }: Props) => {
       data-id={item?.id}
       onClick={handleInput}
     >
+      <div className="flex justify-between">
+        <p>Date :</p>
       <p>{item?.date}</p>
+      </div>
       <p className="break-all bg-slate-500 p-2 rounded-lg">{item?.title}</p>
 
       <hr />

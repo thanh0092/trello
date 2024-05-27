@@ -6,9 +6,9 @@ type Content = {
 };
 type Props = {
   handleUpdate: (e: SyntheticEvent) => void;
-  inputRef: Ref<HTMLInputElement>;
+  inputRef: Ref<HTMLTextAreaElement>;
   item: Content;
-  handleFixCard: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFixCard: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onChange: (e: Date) => void;
   date: string;
   handleDelete: () => void;
@@ -28,9 +28,8 @@ const FormCardUpdate = ({
     
   return (
     <form onSubmit={handleUpdate}>
-      <input
-        type="text"
-        className="w-[250px] mb-3"
+      <textarea
+        className="resize-none rounded-lg w-[100%] min-h-[50px] break-all border-2 pl-3 border-stone-500 focus:outline-stone-600"
         ref={inputRef}
         defaultValue={item.title}
         onChange={handleFixCard}
@@ -38,10 +37,10 @@ const FormCardUpdate = ({
       <Calendar
         onClickDay={onChange}
         
-        value={date}
+        defaultValue={date}
       />
 
-      <div className="flex justify-between">
+      <div className="flex justify-between mt-3">
         <button>Fix</button>
         <button
           className="bg-slate-300 rounded-lg w-[30%]"

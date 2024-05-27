@@ -4,6 +4,7 @@ import React, { Dispatch, Key, SetStateAction, useContext, useEffect, useRef, us
 import List from "@/components/List";
 import { StoreContext } from "@/context/StoreContext";
 import { StoreContextProps, TodoSchema } from "@/interface";
+import { log } from "console";
 
 
 const WorkSpace: NextPage<TodoSchema> = () => {
@@ -13,7 +14,6 @@ const WorkSpace: NextPage<TodoSchema> = () => {
   const [todoData, setTodoData] = useState<TodoSchema>({
     content: [],
     titleList: null,
-    // date: null,
   });
   const [data, setData] = useState<Record<string, TodoSchema>>({});
 
@@ -35,10 +35,16 @@ const WorkSpace: NextPage<TodoSchema> = () => {
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const newId = Date.now().toString();
-    setValue((prev: any) => ({
-      ...prev,
-      [newId]: todoData,
-    }));
+    if(todoData.titleList && todoData.titleList.trim()){
+      setValue((prev: any) => ({
+        ...prev,
+        [newId]: todoData,
+      }));
+    }
+    setTodoData({
+      content: [],
+      titleList: null,
+    })
     setAddCard(false);
   };
 
@@ -73,7 +79,9 @@ const WorkSpace: NextPage<TodoSchema> = () => {
           </>
         )}
 
-        <div className="bg-slate-400 p-4 h-[100px] max-h-[200px] text-xl rounded-lg">
+        <div>
+        <div className="bg-slate-400 p-4 text-xl rounded-lg">
+          <div className="flex flex-col">
           <div>
             <p>Add List</p>
           </div>
@@ -85,6 +93,7 @@ const WorkSpace: NextPage<TodoSchema> = () => {
                 ref={textAreaRef}
                 className="resize-none rounded-lg min-h-[100px] break-all"
                 onChange={handleChange}
+                
               />
               <div className="flex justify-between mt-3">
                 <button
@@ -110,6 +119,8 @@ const WorkSpace: NextPage<TodoSchema> = () => {
               Add More List
             </button>
           )}
+          </div>
+        </div>
         </div>
       </div>
     </>
